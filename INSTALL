@@ -1,0 +1,413 @@
+
+Installation instructions
+-------------------------
+
+Help with installation:
+
+   If you need assistance or have questions about the install procedure,
+   please ask in the Support-forum of the LIVE-server:
+
+      <http://www.dragongoserver.net/forum/list.php?forum=2>
+
+   For developers there's also a normally hidden development-forum on the
+   LIVE-server. If you want to have access, please file a request in the
+   Support-forum on the LIVE-server.
+
+
+Server Requirements:
+
+*) A webserver which can use php, e.g., apache <http://httpd.apache.org>
+*) PHP >= 5.2.0 <http://www.php.net>
+*) MySQL >= 5.0.38 <http://www.mysql.com>
+*) GD >= 2.0.0 to draw rating graph and upload images <http://www.boutell.com/gd/>
+
+Optionally
+
+*) git client <http://git-scm.com>
+*) FreeType for optional fonts in rating graph <http://www.freetype.org>
+
+Last versions used by Dragon Live Server:
+   Apache Version Apache/2.2.3 (Unix) PHP/5.1.6
+   MySQL 5.0.45
+
+Optional but recommended:
+   APC 3.1.9  shared-memory cache
+
+Client Requirements:
+*) browser supporting at least JavaScript 1.8.1 is required for features relying on jQuery
+
+
+#--------------------------------------------------------------------
+
+1) Download sources with images:
+
+Dragon root-directory referred to as DGS_ROOT.
+
+Either download from Git-repository on SourceForge.net:
+
+   # with an existing SourceForge-account 'USER':
+   # (to ease updates it's a good idea to upload your public SSH-key on SourceForge
+   #  to avoid repeated authentification)
+   git clone ssh://USER@git.code.sf.net/p/dragongoserver/dgs-main DGS_ROOT
+
+   # OR: with an anonymous read-only checkout from SourceForge:
+   git clone git://git.code.sf.net/p/dragongoserver/dgs-main DGS_ROOT
+
+   # OR: download a snapshot from   <http://www.dragongoserver.net/snapshot.php>
+
+For both git clone methods, the images are already included, while the download
+of an archive from the snapshot-page only contains the sources, in which case the images
+must be downloaded separately from the snapshot-page as well.
+
+If the images are downloaded from the snapshot, unpack the archive into DGS_ROOT
+to obtain a tree like:
+
+      DGS_ROOT/
+         include/
+         forum/
+         ...
+         images/
+            flags/
+         5/
+         7/
+         ...
+         50/
+
+Copy or link  /images/favicon.ico  into the DGS_ROOT folder (or place your own favicon.ico
+in the root folder). Some older browsers ignore the shortcut-icon directive
+and expects it to be in the document-root.
+
+Copy all  /images/apple-touch-icon-*.png  into the DGS_ROOT folder to avoid 'page_not_found'-errors.
+For reference see also <http://mathiasbynens.be/notes/touch-icons>
+
+
+#--------------------------------------------------------------------
+
+2) Create a mysql database and one or more mysql users to access the database:
+
+   mysql> CREATE DATABASE dragondb;
+
+IMPORTANT NOTE:
+For creating and altering database tables you will need a separate database admin user, e.g. 'dragon_admin'.
+As dragon-db-admin user you may either use the database 'root'-user which has all rights
+or create a separate user with additional access rights:
+
+   mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE TEMPORARY TABLES, LOCK TABLES, CREATE, ALTER, DROP
+          ON dragondb.* TO dragon_admin@localhost IDENTIFIED BY 'adminsecret';
+
+For safety reasons, the website should be accessed by a separate dragon-db-user
+who SHOULD NOT have rights to create, alter or drop tables!
+
+   mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE TEMPORARY TABLES, LOCK TABLES
+          ON dragondb.* TO dragon_user@localhost IDENTIFIED BY 'secret';
+
+
+#--------------------------------------------------------------------
+
+3) Create mysql tables:
+
+Create database-tables needed for a Dragon Go Server
+NOTE: This DDL-Export has been created using PHPMyAdmin: Export(DB) with Export (SQL) and Options:
+      - Add 'IF NOT EXISTS': on
+      - Add 'AUTO_INCREMENT' value: off
+      - Enclose table and field names with backquotes: on
+      - Data: off
+      'dragon-ddl.sql' (unused tables removed)
+
+Have the dragon-db-admin-user create all the tables:
+
+   > mysql -h mysqlhost -u dragon_admin -D dragondb -p < specs/db/dragon-ddl.sql
+
+Import mandatory initial-data for the server:
+
+   > mysql -h mysqlhost -u dragon_admin -D dragondb -p < specs/db/dragon-data.sql
+
+
+IMPORTANT NOTE:
+   Before you try logging in on your local DGS-server, ensure that at least the core translation files
+   have been generated.
+   Otherwise the import in step 2 may fail because of changed primary-keys of translation-data that will be
+   inserted by the running server itself.
+
+Step 1: generate the translations files:
+
+  > mkdir translations
+  > su -c 'chgrp www-data translations'
+  > chmod 775 translations/
+  > pushd scripts
+  > php make_all_translationfiles.php
+  > popd
+
+
+Step 2: optionally, add the latest translations.
+
+After ensuring that all the previous steps to prepare translations have been taken
+as described above, read and execute the directives in 'scripts/README.translations'.
+
+The data file can be downloaded and extracted from:
+
+   <http://www.dragongoserver.net/snapshot.php>
+
+   gunzip Translationdata.mysql.gz
+   mysql -D dragondb < Translationdata.mysql
+
+
+(( The following creation of an DGS admin user could be delayed until you need it:
+Add at least one super-admin user by registering a user via the website and
+then give him the full set of priviledges by manually setting his
+Adminlevel field to 0xffff (setting all bits) in the Players table.
+
+You need a working mailing setup for this, because a user-registration sends out a mail
+with a validation-code to activate the new account. For the registered admin-user
+you either temporarily set 'SEND_ACTIVATION_MAIL' to false in your 'include/config-local.php',
+which bypasses the mail-activation, or you manually do the activation with the
+"ACTIVATE"-statements shown below (2nd next paragraph):
+
+   > mysql -D dragondb
+
+   mysql> UPDATE Players SET Adminlevel=0xffff WHERE Handle='adminusernick';
+
+Then, this user will be able to manage the other admins in the Admin-menu.
+
+You may also need to manually activate the super-admins registration,
+because sending email may not work yet sending out a verification-code
+after the registration.
+
+   # ACTIVATE-statements:
+   mysql> UPDATE Players SET UserFlags=UserFlags & (4|8) WHERE Handle='adminusernick';
+   mysql> UPDATE Verification AS V INNER JOIN Players AS P ON P.ID=V.uid
+             SET V.Verified=NOW(), V.Counter=V.Counter+1 WHERE P.Handle='adminusernick';
+
+))
+
+
+
+
+#--------------------------------------------------------------------
+
+4) Adjust config of software and adjust file permissions:
+
+NOTE: order of the following items is not strict. You may need to re-edit the
+      local-config multiple times for some of the items.
+
+
+* Copy config-template and adjust for local configuration:
+
+  > cp include/config.php include/config-local.php
+
+  Adjust 'include/config-local.php' to fit to your environment and needed set of
+  DGS-features. For configuration of the cache read on first.
+
+  DGS allows a file-based or APC-based caching. For usage and configuration of
+  the caching you need to read some chapters of 'specs/caching.txt':
+
+      - chapter (2a) to install the APC-cache, including the 'apc-live.php'-script
+
+      - chapter (2) in full if you also want to use file-based caching
+
+      - chapter (3) to adjust the cache-configuration in your local config
+
+      - chapter (4) to get familiar with cache-admin scripts
+
+* Edit permissions for include/config-local.php:
+
+  Find out which group your webserver is using (e.g. www-data).
+  > su -c 'chgrp www-data include/config-local.php'
+  > chmod 640 include/config-local.php
+
+* If desired, create a CACHE_FOLDER (from include/config-local.php) with
+  the proper user/groups and rights, so that your web-server
+  can read and write that directory.
+
+  # Create the CACHE_FOLDER-directory (example):
+  mkdir temp
+  chmod 775 temp
+  su -c 'chgrp www-data temp'
+
+* Create a directory to store user-pictures with write-access for the webserver.
+  You can create a sub-directory in the document-root or use an alias /userpic
+  pointing to a folder to store images. Adjust USERPIC_FOLDER in the local
+  config-file.
+
+  NOTE: Be aware, that this is a security risk, if scripts are uploaded into
+        folder. The code assure, that only images are uploaded though.
+        Still some image-formats could be "infected". This case should be
+        handled by DGS-admins.
+
+  Userpic-directory should be at a place that is archived within a regular backup,
+  because the pictures are not stored in the database.
+
+  # Example using CACHE_FOLDER from above as storage:
+  # (assert that URL-part '/userpic' points to USERPIC_FOLDER-directory
+  mkdir temp/userpic
+  ln -s temp/userpic .
+  su -c 'chgrp www-data temp/userpic'
+  su -c 'chmod g+ws temp/userpic'
+
+* Create a directory outside of the document-root with write-access for the webserver.
+  This must be configured in "include/config-local.php" with DATASTORE_FOLDER.
+  The directory can contains sensitive data, that should not be available via web-access.
+  Therefore it should either be located outside of the document-root, or otherwise
+  if located in a sub-directory in the document-root at least put a web-password on
+  it as required for the scripts-sub-dir.
+
+  If the folder is not existing and the web-user has the required rights,
+  the folder will be created by the webserver on-the-fly. But for that, the webserver
+  user must have the necessary rights in the parent directory.
+
+  # Create the DATASTORE_FOLDER-directory (example) and sub-dirs for RSS/quick-status/WAP:
+  mkdir data-store
+  mkdir data-store/rss data-store/qst data-store/wap
+  chmod -R 775 data-store
+  su -c 'chgrp -R www-data data-store'
+
+* Maybe you need to adjust the used timezone.
+  This can be done by creating a file in DGS_ROOT:
+
+     filename:              timeadjust.php
+     content (for example): <?php $timeadjust = ...; ?>
+
+  This file is read by the PHP-include 'include/quick_common.php'
+  and the unit for the variable $timeadjust is seconds.
+  It's added to form the "current timestamp" ($NOW).
+
+  If you want to use the servers time, you can skip this step.
+
+* Configure if you use an external ticket-system.
+  If you do NOT use an external ticket-system to track issues set the config 'TICKET_REF'
+  to an empty string.  Otherwise you may configure a URL, so that the '<ticket issue>' DGS-tag
+  can be used to reference issues in the external ticket-system.
+
+* If you want to adjust the source-code, please have a look to the
+  notes in 'scripts/README.developers'
+
+* MySQL database config:
+
+  In order to support the forum search using a good full-text index,
+  the real DragonGoServer <http://www.dragongoserver.net/> changed the
+  following server variable:
+
+     <http://dev.mysql.com/doc/refman/5.0/en/server-system-variables.html#sysvar_ft_min_word_len>
+
+     ft_min_word_len  =  1     (default-value is 4)
+
+  After the change you have to rebuild the index for the following tables with:
+
+     REPAIR TABLE Messages QUICK
+     REPAIR TABLE Posts QUICK
+
+* PHP config:
+
+  IMPORTANT NOTE: safe_mode should be OFF!
+
+  By now, Dragon works with these PHP directives:
+
+     allow_call_time_pass_reference = Off ;Unused
+     allow_url_fopen = Off ;Unused
+     always_populate_raw_post_data = Off ;Unused
+     arg_separator.input = &
+     arg_separator.output = "&amp;" ;or = "&"
+     asp_tags = Off ;Unused
+     default_charset = ;set to empty or commented
+     default_mimetype = "text/html"
+     error_reporting = E_ALL
+     file_uploads = On ;else the pattern upload will be disabled
+     gpc_order = GPC
+     implicit_flush = Off ;Unused
+     magic_quotes_gpc = Off ;Don't care
+     magic_quotes_runtime = Off
+     magic_quotes_sybase = Off
+     max_execution_time = 30 ;except for some rebuilding scripts with large databases
+     memory_limit = 24M
+     output_buffering = Off
+     post_max_size = 8M ;greater than upload_max_filesize if used
+     precision = 14
+     register_argc_argv = Off ;Unused
+     register_globals = Off ;Don't care
+     safe_mode = Off ;else safe_mode_allowed_env_vars= must allow putenv() to modify 'TZ'
+    ;set sendmail_* options to your needs
+     short_open_tag = Off ;Unused
+     track_vars = On ;always enabled as of PHP 4.0.3
+     upload_max_filesize = 2M ;if used
+     variables_order = EGPCS ;or empty
+    [MySQL]
+     mysql.allow_persistent = Off ;Unused
+     mysql.default_host = ;Unused
+     mysql.default_user = ;Unused
+     mysql.default_password = ;Unused
+     mysql.max_links = -1 ;Unused
+     mysql.trace_mode = Off  ; needed for FOUND_ROWS() to work, see config.php ALLOW_SQL_CALC_ROWS
+
+* if using XDebug (or similar) for local PHP development:
+
+  The max-nesting-level of xdebug must be raised, otherwise encoding JSON for the game-editor will fail
+  (happens if ENABLE_GAME_VIEWER=true and game-page is used):
+
+  Edit xdebug-config for PHP running in Apache, probably at "/etc/php5/apache2/conf.d/xdebug.ini" and
+  adjust (or add) the following config-line:
+
+     xdebug.max_nesting_level=1500
+
+
+* OPTIONAL: for using FreeType-font drawing rating graphs:
+
+Check and adjust defines in 'include/graph.php':
+- TTF_PATH
+- TTF_NAME
+- TTF_HEIGHT
+
+
+
+
+#--------------------------------------------------------------------
+
+5) Add some cron jobs. These should preferrably be run on a remote machine, so that the
+   clock is not running when the network is down.
+
+   Adjust MAILTO in crontab accordingly.
+
+   NOTE: (( Windows NT/200x/XP - some freeware clones of cron may be found on the web ))
+
+   NOTE: For debugging purposes you can use "wget -v" instead of "wget -q" to get a verbose
+         output to STDOUT mailed to you.
+
+> crontab -e
+
+----------------
+# min  hour day  mon  weekday
+# 0-59 0-23 0-31 0-12 0-7
+
+# DGS-live-server triggering clocks
+MAILTO= < EMAIL-OF-YOUR-CHOICE >
+
+*/5  *  *  *  *   wget -q -O - http://www.dragongoserver.net/clock_tick.php
+0,30 *  *  *  *   wget -q --read-timeout=1800 -O - http://www.dragongoserver.net/halfhourly_cron.php
+58   *  *  *  *   wget -q -O - http://www.dragongoserver.net/hourly_cron.php
+25   5  *  *  *   wget -q -O - http://www.dragongoserver.net/daily_cron.php
+#7,22,37,52 * * * *   wget -q -O - http://www.dragongoserver.net/tournaments/cron_tournaments.php
+----------------
+
+
+
+
+#--------------------------------------------------------------------
+
+6) Protect the scripts/ folder from outside access:
+   The scripts/ folder contains security-sensitive tools reserved to the developers
+   or the admins team.
+   You have to protect it with an authentification process (using, for
+   example, the .htaccess AuthUserFile command) or at least move the
+   whole folder outside the server root tree when you have used it.
+
+
+
+
+#--------------------------------------------------------------------
+
+7) If you have problems you can ask for help in the Support or Development forum
+   at dragon   <http://www.dragongoserver.net>   as explained in the "help" note
+   at the top of this documentation.
+
+   If you are successful and have a running Dragon server,
+   we would appreciate a note in the dragon forums as well.
+
