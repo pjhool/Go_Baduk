@@ -15,3 +15,4 @@ Go Baduk Service
 
 *  Install PHP5  ACE 3.1.9 
    *    https://i.justrealized.com/2012/install-apc-ubuntu-12-04/ 
+   *    download :  https://pecl.php.net/package/apc 
