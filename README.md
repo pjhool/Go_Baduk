@@ -18,10 +18,22 @@ Go Baduk Service
    *    download :  https://pecl.php.net/package/apc 
    
 # Short Setup    
+0. Download sources with images:
+```
+git clone git://git.code.sf.net/p/dragongoserver/dgs-main DGS_ROOT
+
+Or  download a snapshot from   <http://www.dragongoserver.net/snapshot.php>
+
+Or  git clone ssh://USER@git.code.sf.net/p/dragongoserver/dgs-main DGS_ROOT
+
+
+```
+
 1. Copy or link  /images/favicon.ico  into the DGS_ROOT folder 
 2. Copy all  /images/apple-touch-icon-*.png  into the DGS_ROOT folder to avoid 'page_not_found'-errors. 
 3. Create a mysql database and one or more mysql users to access the database: 
-    ```
+
+ ```
     mysql> CREATE DATABASE dragondb;
     
     mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE TEMPORARY TABLES, LOCK TABLES, CREATE, ALTER, DROP
@@ -30,7 +42,7 @@ Go Baduk Service
     mysql> GRANT SELECT, INSERT, UPDATE, DELETE, CREATE TEMPORARY TABLES, LOCK TABLES
           ON dragondb.* TO dragon_user@localhost IDENTIFIED BY 'secret';
     
-    ```
+ ```
  4. Create mysql tables:   
    ```
     > mysql -h mysqlhost -u dragon_admin -D dragondb -p < specs/db/dragon-ddl.sql 
@@ -244,8 +256,6 @@ MAILTO= < EMAIL-OF-YOUR-CHOICE >
  The scripts/ folder contains security-sensitive tools reserved to the developers  or the admins team.
  You have to protect it with an authentification process  (using, for example, the .htaccess AuthUserFile command) 
  or at least move the  whole folder outside the server root tree when you have used it.
-
-
 
 ```
 
