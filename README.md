@@ -6,6 +6,8 @@ Go Baduk Service
 # XAMPP On Ubuntu 16.04 
 *  1.7.3	Version  
    *   Apache 2.2.14	, MySQL 5.1.41	, Php 5.3.1	 
+   *   Install XAMPP :  https://andyhat.co.uk/how-to/intermediate/installing-xampp-ubuntu-1110-and-1204 
+   
 *  http://code.iamkate.com/articles/xampp-version-history-apache-mysql-php/ 
 
 # PHP5 Version History 
