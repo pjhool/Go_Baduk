@@ -1,6 +1,6 @@
 # Go_Baduk
 Go Baduk Service 
- - Go Server & Go Client 개발 
+ - Go Server & Go Client Development  
  
 
 # XAMPP On Ubuntu 16.04 ( 32bit) 
@@ -26,6 +26,20 @@ Or  download a snapshot from   <http://www.dragongoserver.net/snapshot.php>
 
 Or  git clone ssh://USER@git.code.sf.net/p/dragongoserver/dgs-main DGS_ROOT
 
+
+If the images are downloaded from the snapshot, unpack the archive into DGS_ROOT
+to obtain a tree like:
+
+      DGS_ROOT/
+         include/
+         forum/
+         ...
+         images/
+            flags/
+         5/
+         7/
+         ...
+         50/
 
 ```
 
