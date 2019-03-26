@@ -26,4 +26,49 @@ config.inc.php 파일상에서 “$cfg[‘Servers’][$i][‘password’]” 항
 
 
 mysql -h localhost -u dragon_admin -D dragondb -p < specs/db/dragon-ddl.sql  
+mysql -h localhost -u dragon_admin -D dragondb -p < specs/db/dragon-data.sql   
+
+
+mkdir translations
+sudo su -c 'chgrp www-data translations'
+chmod 775 translations/
+
+# cp include/config.php include/config-local.php 
+#   export PATH=/opt/lampp/bin:$PATH 
+
+pushd scripts
+php make_all_translationfiles.php
+popd
+
+
+
+sudo su -c 'chgrp www-data include/config-local.php' 
+chmod 640 include/config-local.php 
+
+
+ mkdir temp
+ chmod 775 temp
+ sudo  su -c 'chgrp www-data temp' 
+ 
+ mkdir temp/userpic
+  ln -s temp/userpic .
+ sudo  su -c 'chgrp www-data temp/userpic'
+ suod  su -c 'chmod g+ws temp/userpic'
+ 
+ cd .. 
+ mkdir data-store
+  mkdir data-store/rss data-store/qst data-store/wap
+  chmod -R 775 data-store
+ sudo  su -c 'chgrp -R www-data data-store'
+ 
+
+# edit my.cnf 
+
+# [mysqld ]  
+ft_min_word_len  =  1   #  (default-value is 4)
+
+mysql > REPAIR TABLE Messages QUICK
+mysql > REPAIR TABLE Posts QUICK 
+ 
+ 
 
