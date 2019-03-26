@@ -276,3 +276,5 @@ MAILTO= < EMAIL-OF-YOUR-CHOICE >
 
 # PHP-APC library build 
  *  https://www.samclarke.com/install-apc-with-xampp-on-linux/
+ *  https://sourceforge.net/projects/xampp/files/XAMPP%20Linux/1.7.3/xampp-linux-devel-1.7.3.tar.gz/download 
+ *  https://www.howtoforge.com/apc-php5-apache2-debian-etch 
