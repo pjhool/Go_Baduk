@@ -72,3 +72,12 @@ mysql > REPAIR TABLE Posts QUICK
  
  
 
+
+
+
+cp -av $DGS_ROOT /opt/lampp/htdocs
+
+chmod +r include/config-local.php 
+#edit  define('SUB_PATH', '/dgs/');  
+ 
+
