@@ -273,3 +273,6 @@ MAILTO= < EMAIL-OF-YOUR-CHOICE >
 
 ```
 
+
+# PHP-APC library build 
+ *  https://www.samclarke.com/install-apc-with-xampp-on-linux/
