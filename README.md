@@ -1,6 +1,9 @@
 # Go_Baduk
 Go Baduk Service 
  - Go Server & Go Client Development  
+ - Go Client 
+    *   https://github.com/blamarche/dragon-go-desktop-client 
+ 
  
 
 # XAMPP On Ubuntu 16.04 ( 32bit) 
