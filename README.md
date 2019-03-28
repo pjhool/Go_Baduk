@@ -281,3 +281,19 @@ MAILTO= < EMAIL-OF-YOUR-CHOICE >
  *  https://www.samclarke.com/install-apc-with-xampp-on-linux/
  *  https://sourceforge.net/projects/xampp/files/XAMPP%20Linux/1.7.3/xampp-linux-devel-1.7.3.tar.gz/download 
  *  https://www.howtoforge.com/apc-php5-apache2-debian-etch 
+ 
+ 
+ 
+# [Ubuntu 16.04] node.js && npm installation 
+
+ 1. sudo apt-get update 
+ 2. sudo apt-get install build-essential libssl-dev
+ 3. curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh -o install_nvm.sh
+ 4. bash install_nvm.sh  
+ 5. source ~/.profile 
+ 6. nvm ls-remote
+ 7. nvm install 6.0.0 
+ 8. nvm use 6.0.0 
+ 
+ *  https://itstory.tk/entry/Ubuntu-1604-nodejs-%EC%99%80-npm-%EC%84%A4%EC%B9%98 
+
