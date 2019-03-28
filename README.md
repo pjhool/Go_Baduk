@@ -292,8 +292,8 @@ MAILTO= < EMAIL-OF-YOUR-CHOICE >
  4. bash install_nvm.sh  
  5. source ~/.profile 
  6. nvm ls-remote
- 7. nvm install 6.0.0 
- 8. nvm use 6.0.0 
+ 7. nvm install 8.15.1
+ 8. nvm use 8.15.1  
  
  *  https://itstory.tk/entry/Ubuntu-1604-nodejs-%EC%99%80-npm-%EC%84%A4%EC%B9%98 
 
