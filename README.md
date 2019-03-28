@@ -2,7 +2,8 @@
 Go Baduk Service 
  - Go Server & Go Client Development  
  - Go Client 
-    *   https://github.com/blamarche/dragon-go-desktop-client 
+    *   Desktop Client : https://github.com/blamarche/dragon-go-desktop-client 
+    *   Electron Packaing : https://jiwondh.github.io/2017/06/23/Electron2/ 
  
  
 
